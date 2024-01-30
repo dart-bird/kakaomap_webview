@@ -7,8 +7,7 @@ class KakaoMapScreen extends StatelessWidget {
 
   final String url;
 
-  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey =
-      GlobalKey<ScaffoldMessengerState>();
+  final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
   @override
   Widget build(BuildContext context) {
@@ -16,21 +15,29 @@ class KakaoMapScreen extends StatelessWidget {
       key: _scaffoldMessengerKey,
       child: Scaffold(
           body: SafeArea(
-        child: WebView(
-          initialUrl: url,
-          javascriptMode: JavascriptMode.unrestricted,
-          javascriptChannels: <JavascriptChannel>{_toasterJavascriptChannel()},
-        ),
+        child: WebViewWidget(
+            controller: WebViewController()
+              ..setJavaScriptMode(JavaScriptMode.unrestricted)
+              ..setBackgroundColor(const Color(0x00000000))
+              ..setNavigationDelegate(
+                NavigationDelegate(
+                  onProgress: (int progress) {
+                    // Update loading bar.
+                  },
+                  onPageStarted: (String url) {},
+                  onPageFinished: (String url) {},
+                  onWebResourceError: (WebResourceError error) {},
+                  onNavigationRequest: (NavigationRequest request) {
+                    if (!request.url.startsWith('about:blank')) {
+                      return NavigationDecision.prevent;
+                    }
+                    return NavigationDecision.navigate;
+                  },
+                ),
+              )
+              ..addJavaScriptChannel('Toaster', onMessageReceived: (JavaScriptMessage message) => _scaffoldMessengerKey.currentState?.showSnackBar(SnackBar(content: Text(message.message))))
+              ..loadRequest(Uri.parse(url))),
       )),
     );
-  }
-
-  JavascriptChannel _toasterJavascriptChannel() {
-    return JavascriptChannel(
-        name: 'Toaster',
-        onMessageReceived: (JavascriptMessage message) {
-          _scaffoldMessengerKey.currentState
-              ?.showSnackBar(SnackBar(content: Text(message.message)));
-        });
   }
 }

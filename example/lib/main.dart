@@ -16,7 +16,6 @@ class KakaoMapTest extends StatefulWidget {
 }
 
 class _KakaoMapTestState extends State<KakaoMapTest> {
-  late WebViewController _mapController;
   final double _lat = 33.450701;
   final double _lng = 126.570667;
 
@@ -38,28 +37,15 @@ class _KakaoMapTestState extends State<KakaoMapTest> {
             showZoomControl: true,
             draggableMarker: true,
             mapType: MapType.BICYCLE,
-            mapController: (controller) {
-              _mapController = controller;
-            },
             polyline: KakaoFigure(
-              path: [
-                KakaoLatLng(lat: 33.45080604081833, lng: 126.56900858718982),
-                KakaoLatLng(lat: 33.450766588506054, lng: 126.57263147947938),
                 KakaoLatLng(lat: 33.45162008091554, lng: 126.5713226693152)
-              ],
+              path: [KakaoLatLng(lat: 33.45080604081833, lng: 126.56900858718982), KakaoLatLng(lat: 33.450766588506054, lng: 126.57263147947938), KakaoLatLng(lat: 33.45162008091554, lng: 126.5713226693152)],
               strokeColor: Colors.blue,
               strokeWeight: 2.5,
               strokeColorOpacity: 0.9,
             ),
             polygon: KakaoFigure(
-              path: [
-                KakaoLatLng(lat: 33.45086654081833, lng: 126.56906858718982),
-                KakaoLatLng(lat: 33.45010890948828, lng: 126.56898629127468),
-                KakaoLatLng(lat: 33.44979857909499, lng: 126.57049357211622),
-                KakaoLatLng(lat: 33.450137483918496, lng: 126.57202991943016),
-                KakaoLatLng(lat: 33.450706188506054, lng: 126.57223147947938),
-                KakaoLatLng(lat: 33.45164068091554, lng: 126.5713126693152)
-              ],
+              path: [KakaoLatLng(lat: 33.45086654081833, lng: 126.56906858718982), KakaoLatLng(lat: 33.45010890948828, lng: 126.56898629127468), KakaoLatLng(lat: 33.44979857909499, lng: 126.57049357211622), KakaoLatLng(lat: 33.450137483918496, lng: 126.57202991943016), KakaoLatLng(lat: 33.450706188506054, lng: 126.57223147947938), KakaoLatLng(lat: 33.45164068091554, lng: 126.5713126693152)],
               polygonColor: Colors.red,
               polygonColorOpacity: 0.3,
               strokeColor: Colors.deepOrange,
@@ -91,25 +77,20 @@ const customOverlay = new kakao.maps.CustomOverlay({
     yAnchor: 1
 });
               ''',
-            markerImageURL:
-                'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
-            onTapMarker: (message) {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(message.message)));
+            markerImageURL: 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png',
+            onTapMarker: (JavascriptMessage message) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message.message)));
             },
-            zoomChanged: (message) {
+            zoomChanged: (JavascriptMessage message) {
               debugPrint('[zoom] ${message.message}');
             },
-            cameraIdle: (message) {
-              KakaoLatLng latLng =
-                  KakaoLatLng.fromJson(jsonDecode(message.message));
+            cameraIdle: (JavascriptMessage message) {
+              KakaoLatLng latLng = KakaoLatLng.fromJson(jsonDecode(message.message));
               debugPrint('[idle] ${latLng.lat}, ${latLng.lng}');
             },
-            boundaryUpdate: (message) {
-              KakaoBoundary boundary =
-                  KakaoBoundary.fromJson(jsonDecode(message.message));
-              debugPrint(
-                  '[boundary] ne : ${boundary.neLat}, ${boundary.neLng}, sw : ${boundary.swLat}, ${boundary.swLng}');
+            boundaryUpdate: (JavascriptMessage message) {
+              KakaoBoundary boundary = KakaoBoundary.fromJson(jsonDecode(message.message));
+              debugPrint('[boundary] ne : ${boundary.neLat}, ${boundary.neLng}, sw : ${boundary.swLat}, ${boundary.swLng}');
             },
           ),
           Row(
@@ -117,8 +98,7 @@ const customOverlay = new kakao.maps.CustomOverlay({
             children: [
               InkWell(
                 onTap: () {
-                  _mapController.runJavascript(
-                      'map.setLevel(map.getLevel() - 1, {animate: true})');
+                  // _mapController.runJavascript('map.setLevel(map.getLevel() - 1, {animate: true})');
                 },
                 child: CircleAvatar(
                   backgroundColor: Colors.red,
@@ -130,8 +110,7 @@ const customOverlay = new kakao.maps.CustomOverlay({
               ),
               InkWell(
                 onTap: () {
-                  _mapController.runJavascript(
-                      'map.setLevel(map.getLevel() + 1, {animate: true})');
+                  // _mapController.runJavascript('map.setLevel(map.getLevel() + 1, {animate: true})');
                 },
                 child: CircleAvatar(
                   backgroundColor: Colors.blue,
@@ -148,15 +127,15 @@ const customOverlay = new kakao.maps.CustomOverlay({
             children: [
               InkWell(
                 onTap: () {
-                  _mapController.runJavascript('''
-      addMarker(new kakao.maps.LatLng($_lat + 0.0003, $_lng + 0.0003));
-      
-      function addMarker(position) {
-        let testMarker = new kakao.maps.Marker({position: position});
+                  //             _mapController.runJavascript('''
+                  // addMarker(new kakao.maps.LatLng($_lat + 0.0003, $_lng + 0.0003));
 
-        testMarker.setMap(map);
-      }
-                      ''');
+                  // function addMarker(position) {
+                  //   let testMarker = new kakao.maps.Marker({position: position});
+
+                  //   testMarker.setMap(map);
+                  // }
+                  //                 ''');
                 },
                 child: CircleAvatar(
                   backgroundColor: Colors.amber,
@@ -168,7 +147,7 @@ const customOverlay = new kakao.maps.CustomOverlay({
               ),
               InkWell(
                 onTap: () async {
-                  await _mapController.reload();
+                  // await _mapController.reload();
                   debugPrint('[refresh] done');
                 },
                 child: CircleAvatar(
@@ -198,24 +177,21 @@ const customOverlay = new kakao.maps.CustomOverlay({
     //     util.getKakaoMapURL(37.402056, 127.108212, name: 'Kakao 본사'));
 
     /// This is short form of the above comment
-    String url =
-        await util.getMapScreenURL(37.402056, 127.108212, name: 'Kakao 본사');
+    String url = await util.getMapScreenURL(37.402056, 127.108212, name: 'Kakao 본사');
 
     debugPrint('url : $url');
 
-    Navigator.push(
-        context, MaterialPageRoute(builder: (_) => KakaoMapScreen(url: url)));
+    Navigator.push(context, MaterialPageRoute(builder: (_) => KakaoMapScreen(url: url)));
   }
 
-  Widget _testingCustomScript(
-      {required Size size, required BuildContext context}) {
+  Widget _testingCustomScript({required Size size, required BuildContext context}) {
     return KakaoMapView(
-        width: size.width,
-        height: 400,
-        kakaoMapKey: kakaoMapKey,
-        lat: 33.450701,
-        lng: 126.570667,
-        customScript: '''
+      width: size.width,
+      height: 400,
+      kakaoMapKey: kakaoMapKey,
+      lat: 33.450701,
+      lng: 126.570667,
+      customScript: '''
     let markers = [];
     
     function addMarker(position) {
@@ -243,9 +219,9 @@ const customOverlay = new kakao.maps.CustomOverlay({
       const mapTypeControl = new kakao.maps.MapTypeControl();
       map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
               ''',
-        onTapMarker: (message) {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(message.message)));
-        });
+      onTapMarker: (JavascriptMessage message) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message.message)));
+      },
+    );
   }
 }
